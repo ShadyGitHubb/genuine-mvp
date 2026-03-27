@@ -3,11 +3,7 @@
 import { useState } from 'react';
 import Confetti from './Confetti';
 
-interface WaitlistSuccessProps {
-  name: string;
-}
-
-export default function WaitlistSuccess({ name }: WaitlistSuccessProps) {
+export default function WaitlistSuccess() {
   const [copied, setCopied] = useState(false);
 
   const shareText = `just joined the waitlist for genUine — an AI that writes LinkedIn messages in your actual voice. worth checking out: https://genuine.so/waitlist`;
@@ -71,7 +67,7 @@ export default function WaitlistSuccess({ name }: WaitlistSuccessProps) {
             marginBottom: '12px',
           }}
         >
-          you&apos;re in, {name.split(' ')[0]}!
+          you&apos;re in!
         </h2>
 
         <p
