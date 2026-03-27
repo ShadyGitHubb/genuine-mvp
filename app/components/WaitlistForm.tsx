@@ -67,18 +67,28 @@ export default function WaitlistForm() {
     setErrorMsg('');
 
     try {
-      const res = await fetch('/api/waitlist', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+      const formElement = e.currentTarget as HTMLFormElement;
+      const formData = new FormData(formElement);
+      const params = new URLSearchParams();
+
+      formData.forEach((value, key) => {
+        if (typeof value === 'string') {
+          params.append(key, value);
+        }
       });
-      const data = await res.json();
+
+      const res = await fetch('/__forms.html', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: params.toString(),
+      });
 
       if (!res.ok) {
-        setErrorMsg(data.error || 'Something went wrong.');
+        setErrorMsg('Something went wrong. Please try again.');
         setStatus('error');
       } else {
         setStatus('success');
+        formElement.reset();
       }
     } catch {
       setErrorMsg('Network error. Please try again.');
@@ -94,7 +104,20 @@ export default function WaitlistForm() {
     focusedField === field ? { borderColor: '#C4784A', boxShadow: '0 0 0 3px rgba(196, 120, 74, 0.1)' } : {};
 
   return (
-    <form onSubmit={handleSubmit} style={{ width: '100%', maxWidth: '480px', margin: '0 auto' }}>
+    <form
+      name="waitlist"
+      method="POST"
+      data-netlify="true"
+      netlify-honeypot="bot-field"
+      onSubmit={handleSubmit}
+      style={{ width: '100%', maxWidth: '480px', margin: '0 auto' }}
+    >
+      <input type="hidden" name="form-name" value="waitlist" />
+      <p style={{ display: 'none' }}>
+        <label>
+          Do not fill this out: <input name="bot-field" />
+        </label>
+      </p>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
         {/* Name */}
@@ -104,6 +127,7 @@ export default function WaitlistForm() {
           </label>
           <input
             type="text"
+            name="name"
             placeholder="first name is fine"
             value={form.name}
             onChange={(e) => set('name', e.target.value)}
@@ -121,6 +145,7 @@ export default function WaitlistForm() {
           </label>
           <input
             type="email"
+            name="email"
             placeholder="you@email.com"
             value={form.email}
             onChange={(e) => set('email', e.target.value)}
@@ -137,6 +162,7 @@ export default function WaitlistForm() {
             what brings you to genUine? <span style={{ color: '#C4784A' }}>*</span>
           </label>
           <select
+            name="userType"
             value={form.userType}
             onChange={(e) => set('userType', e.target.value)}
             onFocus={() => setFocusedField('userType')}
@@ -166,6 +192,7 @@ export default function WaitlistForm() {
           <label style={labelStyle}>your linkedin (optional)</label>
           <input
             type="url"
+            name="linkedinUrl"
             placeholder="linkedin.com/in/yourname"
             value={form.linkedinUrl}
             onChange={(e) => set('linkedinUrl', e.target.value)}
@@ -181,6 +208,7 @@ export default function WaitlistForm() {
             what&apos;s your biggest struggle with LinkedIn messages? <span style={{ color: '#A08C7C', fontWeight: 400 }}>(optional)</span>
           </label>
           <textarea
+            name="messagingStruggle"
             placeholder="e.g. I never know how to start, or it sounds too formal..."
             value={form.messagingStruggle}
             onChange={(e) => set('messagingStruggle', e.target.value)}
@@ -199,6 +227,7 @@ export default function WaitlistForm() {
         {/* Source (optional) */}
         <div>
           <select
+            name="source"
             value={form.source}
             onChange={(e) => set('source', e.target.value)}
             onFocus={() => setFocusedField('source')}
